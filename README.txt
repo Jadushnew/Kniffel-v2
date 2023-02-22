@@ -1,0 +1,1 @@
+to fix: round ends when invalid row was clicked on!

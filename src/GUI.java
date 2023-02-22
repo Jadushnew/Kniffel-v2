@@ -41,26 +41,6 @@ public class GUI implements ActionListener, MouseListener {
 	
 	private boolean cancelModeOn = false;
 
-	public boolean isFirstPartFull() {
-		return firstPartFull;
-	}
-
-	public void setFirstPartFull(boolean firstPartFull) {
-		this.firstPartFull = firstPartFull;
-	}
-
-	public boolean isSecondPartFull() {
-		return secondPartFull;
-	}
-
-	public void setSecondPartFull(boolean secondPartFull) {
-		this.secondPartFull = secondPartFull;
-	}
-
-	//booleans for the check if everything is full
-	private boolean firstPartFull = false;
-	private boolean secondPartFull = false;
-
 	public GUI(String playerName) {
 
 		player1 = new Player(playerName);
@@ -349,18 +329,6 @@ public class GUI implements ActionListener, MouseListener {
 
 	}
 	
-	public void bookPoints(int row) {
-		
-		playTable.setValueAt(Integer.toString(roundPoints), row, 1);
-		opp.setOutput("");
-		checkSum(row);
-		
-		if(firstPartFull && secondPartFull) {
-			System.out.println("all rows filled");
-		} else {
-			roundRestart();
-		}
-	}
 
 	public void cancelRow() {
 		if(cancelModeOn) {
@@ -373,9 +341,9 @@ public class GUI implements ActionListener, MouseListener {
 		}
 	}
 	
-	public void checkSum(int row) {
+	//checks if the upper part of the table is full || WHEN THIS COMMENT DISAPPEARS, THE REWRITE IS UNDONE
+	public boolean checkIfUpperPartIsFull(int row) {
 		
-		//check upper part of table
 		if (row > 0 && row <7) {
 			boolean[] isFull = new boolean[6];
 			for (int i = 1; i < 7; i++) {
@@ -390,13 +358,18 @@ public class GUI implements ActionListener, MouseListener {
 				}
 			}
 			if(isFull[0] && isFull[1] && isFull[2] && isFull[3] && isFull[4] && isFull[5]) {
-				writeSum(7);
-				firstPartFull = true;
-				giveBonus();
+				return true;
+			} else {
+				return false;
 			}
 		}
-
-		//check lower part of table
+		
+		return false;
+	}
+	
+	//checks if the lower part of the table is full
+	public boolean checkIfLowerPartIsFull(int row) {
+		
 		if (row > 9 && row <17) {
 			boolean[] isFull = new boolean[7];
 			for (int i = 10; i < 17; i++) {
@@ -411,10 +384,13 @@ public class GUI implements ActionListener, MouseListener {
 				}
 			}
 			if(isFull[0] && isFull[1] && isFull[2] && isFull[3] && isFull[4] && isFull[5] && isFull[6]) {
-				writeSum(17);
-				secondPartFull = true;
+				return true;
+			} else {
+				return false;
 			}
 		}
+		
+		return false;
 	}
 	
 	public void writeSum(int row) {
@@ -448,29 +424,18 @@ public class GUI implements ActionListener, MouseListener {
 		return LowerSum;
 	}
 	
-	public void giveBonus() {
-		if(Integer.parseInt(tableArray[7][1]) >= 63) {
-			playTable.setValueAt(Integer.toString(35), 8, 1);
-			playTable.setValueAt(Integer.toString(Integer.parseInt((tableArray[7][1])) + 35), 9, 1);
-		} else {
-			playTable.setValueAt((tableArray[7][1]), 9, 1);
-		}
-		playTable.setValueAt((tableArray[9][1]), 17, 1);
-	}
-
-	public void checkAndWrite(int row) {
+	public boolean checkIfWriteable(int row) {
 		
 		if(Integer.parseInt(tableArray[row][1]) == 0 && tableArray[row][1] != "cancelled") {
 			
-			boolean validFound = false;
 			//check number rows
 			if (row > 0 && row < 7) {
 				for (int i = 0; i < dice.length; i++) {
 					if (dice[i].getValue() == row) {
 						roundPoints += dice[i].getValue();
-						validFound = true;
 					}
 				}
+				return true;
 			}
 			//check three of a kind
 			if (row == 10) {
@@ -484,10 +449,9 @@ public class GUI implements ActionListener, MouseListener {
 					if (occurance[j] >= 3) {
 						roundPoints = dice[0].getValue() + dice[1].getValue() + dice[2].getValue() + dice[3].getValue()
 								+ dice[4].getValue();
-						validFound = true;
-
 					}
 				}
+				return true;
 			}
 			//check four of a kind
 			if (row == 11) {
@@ -501,9 +465,9 @@ public class GUI implements ActionListener, MouseListener {
 					if (occurance[j] >= 4) {
 						roundPoints = dice[0].getValue() + dice[1].getValue() + dice[2].getValue() + dice[3].getValue()
 								+ dice[4].getValue();
-						validFound = true;
 					}
 				}
+				return true;
 			}
 			//check for little street
 			if (row == 12) {
@@ -520,8 +484,8 @@ public class GUI implements ActionListener, MouseListener {
 				}
 				if (neighbours > 2) {
 					roundPoints = 30;
-					validFound = true;
 				}
+				return true;
 			}
 			//check for great street
 			if (row == 13) {
@@ -538,8 +502,8 @@ public class GUI implements ActionListener, MouseListener {
 				}
 				if (neighbours > 3) {
 					roundPoints = 40;
-					validFound = true;
 				}
+				return true;
 			}
 			//check for Full House
 			if (row == 14) {
@@ -557,13 +521,12 @@ public class GUI implements ActionListener, MouseListener {
 							if (l != k) {
 								if (occurance[l] == 3) {
 									roundPoints = 25;
-									validFound = true;
 								}
 							}
 						}
 					}
-
 				}
+				return true;
 			}
 			//check for Kniffel
 			if (row == 15) {
@@ -573,24 +536,21 @@ public class GUI implements ActionListener, MouseListener {
 				}
 				if (result % 5 == 0) {
 					roundPoints = 50;
-					validFound = true;
 				}
+				return true;
 			}
 			//check for Chance
 			if (row == 16) {
 				for (int i = 0; i < dice.length; i++) {
 					roundPoints += dice[i].getValue();
-					validFound = true;
 				}
+				return true;
 			}
-			if (validFound) {
-				bookPoints(row);
-			} else {
-				opp.setOutput("not a valid row! Please choose another!");
-			} 
+			
 		} else {
-			opp.setOutput("not a valid row! Please choose another!");
+			return false;
 		}
+		return false;
 	}
 
 	@Override
@@ -605,35 +565,53 @@ public class GUI implements ActionListener, MouseListener {
 					cancelRow();
 					roundRestart();
 				} else {
-					checkAndWrite(row);
+					handleEndOfRound(row);
 				}
 			}
 		}
 
 	}
+	
+	//handles the end of a round
+	public void handleEndOfRound(int row) {
+		
+		if (checkIfWriteable(row)) {
+			bookPoints(row);
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+			if(checkIfUpperPartIsFull(row)) {
+				writeSum(7);
+				giveBonus();
+			}
+			
+			if(checkIfLowerPartIsFull(row)) {
+				writeSum(18);
+			}
+			
+			if(checkIfUpperPartIsFull(row) && checkIfLowerPartIsFull(row)) {
+				System.out.println("all rows filled, game ended");
+			} else {
+				roundRestart();
+			}
+		} else {
+			opp.setOutput("not a valid row! Please choose another!");
+			handleEndOfRound(row);
+		}
 	}
 
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+	//writes the points into the table, resets the output panel
+	public void bookPoints(int row) {
+		playTable.setValueAt(Integer.toString(roundPoints), row, 1);
+		opp.setOutput("");
 	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+	
+	public void giveBonus() {
+		if(Integer.parseInt(tableArray[7][1]) >= 63) {
+			playTable.setValueAt(Integer.toString(35), 8, 1);
+			playTable.setValueAt(Integer.toString(Integer.parseInt((tableArray[7][1])) + 35), 9, 1);
+		} else {
+			playTable.setValueAt((tableArray[7][1]), 9, 1);
+		}
+		playTable.setValueAt((tableArray[9][1]), 17, 1);
 	}
 	
 	public void roundRestart() {
@@ -650,5 +628,29 @@ public class GUI implements ActionListener, MouseListener {
 	
 	public String getTableValues(int row) {
 		return tableArray[row][1];
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
