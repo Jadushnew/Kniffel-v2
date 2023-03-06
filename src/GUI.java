@@ -342,82 +342,6 @@ public class GUI implements ActionListener, MouseListener {
 	}
 
 
-	// checks if the upper part of the table is full
-	public boolean checkIfUpperPartIsFull() {
-
-		boolean[] isFull = new boolean[6];
-		for (int i = 1; i < 7; i++) {
-			if ((playTable.getValueAt(i, 1)).toString().equals("cancelled") || !(playTable.getValueAt(i, 1)).toString().equals("0")) {
-				isFull[i-1] = true;
-			} else {
-				isFull[i-1] = false;
-			}
-		}
-		if (isFull[0] && isFull[1] && isFull[2] && isFull[3] && isFull[4] && isFull[5]) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// checks if the lower part of the table is full
-	public boolean checkIfLowerPartIsFull() {
-
-		boolean[] isFull = new boolean[7];
-		for (int i = 10; i < 17; i++) {
-			if ((playTable.getValueAt(i, 1)).toString().equals("cancelled") || !(playTable.getValueAt(i, 1)).toString().equals("0")) {
-				isFull[i-10] = true;
-			} else {
-				isFull[i-10] = false;
-			}
-		}
-		if (isFull[0] && isFull[1] && isFull[2] && isFull[3] && isFull[4] && isFull[5] && isFull[6]) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// writes the sum of the table part in the respective row
-	public void writeSum(int row) {
-		switch (row) {
-		case 7: {
-			playTable.setValueAt(Integer.toString(sumUpperPoints()), row, 1);
-			break;
-		}
-		case 18: {
-			playTable.setValueAt(Integer.toString(sumLowerPoints()), row, 1);
-			break;
-		}
-		case 19: {
-			System.out.println("DEBUG: writeSum called");
-			int finalSum = sumUpperPoints() + sumLowerPoints();
-			playTable.setValueAt(Integer.toString(finalSum), row, 1);
-			break;
-		}
-		}
-	}
-
-	public int sumUpperPoints() {
-		int upperSum = 0;
-		for (int i = 1; i < 7; i++) {
-			if (!playTable.getValueAt(i, 1).toString().equals("cancelled")) {
-				upperSum += Integer.parseInt(playTable.getValueAt(i, 1).toString());
-			}
-		}
-		return upperSum;
-	}
-
-	public int sumLowerPoints() {
-		int lowerSum = 0;
-		for (int i = 10; i < 17; i++) {
-			if (!playTable.getValueAt(i, 1).toString().equals("cancelled")) {
-				lowerSum += Integer.parseInt(playTable.getValueAt(i, 1).toString());
-			}
-		}
-		return lowerSum;
-	}
-
 	// handles the tables cell when clicked on
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -605,6 +529,81 @@ public class GUI implements ActionListener, MouseListener {
 		opp.setOutput("please continue");
 	}
 
+	// writes the sum of the table part in the respective row
+	public void writeSum(int row) {
+		switch (row) {
+		case 7: {
+			playTable.setValueAt(Integer.toString(sumUpperPoints()), row, 1);
+			break;
+		}
+		case 18: {
+			playTable.setValueAt(Integer.toString(sumLowerPoints()), row, 1);
+			break;
+		}
+		case 19: {
+			int finalSum = sumUpperPoints() + sumLowerPoints();
+			playTable.setValueAt(Integer.toString(finalSum), row, 1);
+			break;
+		}
+		}
+	}
+
+	public int sumUpperPoints() {
+		int upperSum = 0;
+		for (int i = 1; i < 7; i++) {
+			if (!playTable.getValueAt(i, 1).toString().equals("cancelled")) {
+				upperSum += Integer.parseInt(playTable.getValueAt(i, 1).toString());
+			}
+		}
+		return upperSum;
+	}
+
+	public int sumLowerPoints() {
+		int lowerSum = 0;
+		for (int i = 10; i < 17; i++) {
+			if (!playTable.getValueAt(i, 1).toString().equals("cancelled")) {
+				lowerSum += Integer.parseInt(playTable.getValueAt(i, 1).toString());
+			}
+		}
+		return lowerSum;
+	}
+
+	// checks if the upper part of the table is full
+	public boolean checkIfUpperPartIsFull() {
+	
+		boolean[] isFull = new boolean[6];
+		for (int i = 1; i < 7; i++) {
+			if ((playTable.getValueAt(i, 1)).toString().equals("cancelled") || !(playTable.getValueAt(i, 1)).toString().equals("0")) {
+				isFull[i-1] = true;
+			} else {
+				isFull[i-1] = false;
+			}
+		}
+		if (isFull[0] && isFull[1] && isFull[2] && isFull[3] && isFull[4] && isFull[5]) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// checks if the lower part of the table is full
+	public boolean checkIfLowerPartIsFull() {
+	
+		boolean[] isFull = new boolean[7];
+		for (int i = 10; i < 17; i++) {
+			if ((playTable.getValueAt(i, 1)).toString().equals("cancelled") || !(playTable.getValueAt(i, 1)).toString().equals("0")) {
+				isFull[i-10] = true;
+			} else {
+				isFull[i-10] = false;
+			}
+		}
+		if (isFull[0] && isFull[1] && isFull[2] && isFull[3] && isFull[4] && isFull[5] && isFull[6]) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	// gives the bonus if the necessary score is reached
 	public void giveBonus() {
 		if (Integer.parseInt(playTable.getValueAt(7, 1).toString()) >= 63) {
@@ -627,6 +626,7 @@ public class GUI implements ActionListener, MouseListener {
 			buttons[i].setEnabled(false);
 			buttons[i].setText("not kept!");
 		}
+		cancelModeOn = false;
 		rcp.setLabel("<html>round over<br>roll dice to start next round</html>");
 	}
 
