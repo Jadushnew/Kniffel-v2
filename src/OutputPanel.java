@@ -19,7 +19,7 @@ public class OutputPanel extends JPanel {
 		this.playerName.setText("Player: " + playerName);
 		border = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
 		this.add(Box.createRigidArea(new Dimension(20,0)));
-		output = new JLabel("", SwingConstants.CENTER);
+		output = new JLabel("please continue", SwingConstants.CENTER);
 		
 		this.setBorder(border);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

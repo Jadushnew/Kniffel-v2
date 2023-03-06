@@ -8,18 +8,18 @@ import java.io.IOException;
 
 public class SaveGameHandler{
 	
-	private String[][] desiredTableValues = new String[20][2];
+	private String[] desiredTableValues = new String[19];
 	private String desiredPlayerName;
 	private int[] desiredValues = new int[5];
 	private int desiredAttempts;
 
-	public void saveGame(String playerName, int[] currentValues, String[][] currentTableValues, int currentAttempts) {
+	public void saveGame(String playerName, int[] currentValues, String[] currentTableValues, int currentAttempts) {
 		try {
 			BufferedWriter writer;
 			
-			writer = new BufferedWriter(new FileWriter(System.getProperty("user.dir") + "\\saves\\" + java.time.LocalDate.now() + "_save_.txt"));
-			for (int i = 1; i < 20; i++) {
-				writer.write(currentTableValues[i][1]+"\n");
+			writer = new BufferedWriter(new FileWriter(System.getProperty("user.dir") + "\\saves\\" + java.time.LocalDate.now() + "_" + playerName +"_save_.txt"));
+			for (int i = 0; i < 19; i++) {
+				writer.write(currentTableValues[i]+"\n");
 			}
 			writer.write(playerName+"\n");
 			writer.write(Integer.toString(currentAttempts)+"\n");
@@ -36,8 +36,8 @@ public class SaveGameHandler{
 	public void loadGame(File toLoad) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(toLoad));
-			for(int i=1; i<20;i++) {
-				desiredTableValues[i][1] = reader.readLine();
+			for(int i=0; i<19; i++) {
+				desiredTableValues[i] = reader.readLine();
 			}
 			desiredPlayerName = reader.readLine();
 			desiredAttempts = Integer.parseInt(reader.readLine());
@@ -51,7 +51,7 @@ public class SaveGameHandler{
 		}
 	}
 
-	public String[][] getDesiredTableValues() {
+	public String[] getDesiredTableValues() {
 		return desiredTableValues;
 	}
 

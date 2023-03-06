@@ -35,7 +35,6 @@ public class KniffelGame extends JFrame implements ActionListener{
 	
 	public KniffelGame() {
 		setTitle("Kniffel");
-		setLocationRelativeTo(null);
 		setSize(400,400);
 		setLayout(new BorderLayout());
 		
@@ -66,6 +65,7 @@ public class KniffelGame extends JFrame implements ActionListener{
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
+		setLocationRelativeTo(null);
 	}
 	
 	public void startNewGame() {
@@ -75,12 +75,14 @@ public class KniffelGame extends JFrame implements ActionListener{
 		this.revalidate();
 	}
 	
+	// starts a new game with no values
 	public void startGame(String playerName) {
 		gameGUI = new GUI(playerName);
 		this.setVisible(false);
 		}
 	
-	public void loadOldGame() {
+	// starts a game with given values (loading)
+	public void startGame() {
 		new GUI(handler.getDesiredPlayerName(), handler.getDesiredValues(), handler.getDesiredTableValues(), handler.getDesiredAttempts());
 		this.setVisible(false);
 	}
@@ -94,8 +96,11 @@ public class KniffelGame extends JFrame implements ActionListener{
 			JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "\\saves\\");
 			fileChooser.showOpenDialog(buttonPanel);
 			File selectedFile = fileChooser.getSelectedFile();
-			handler.loadGame(selectedFile);
-			loadOldGame();
+			try {
+				handler.loadGame(selectedFile);
+				startGame();
+			} catch (NullPointerException e1) {
+			}
 		}
 		if(e.getSource() == name) {
 			startGame(name.getText());
