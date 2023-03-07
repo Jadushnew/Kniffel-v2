@@ -32,6 +32,7 @@ public class GUI implements ActionListener, MouseListener {
 	private RollCheckPanel rcp;
 	private JButton cancelRowButton;
 	private JButton saveButton;
+	private JButton mainMenuButton;
 	// OutputPanel holds the playerName and gives commands to the player
 	private OutputPanel opp;
 	private int attempt = 3;
@@ -114,7 +115,7 @@ public class GUI implements ActionListener, MouseListener {
 	}
 
 	public void createBackground() {
-		window = new JFrame("Kniffel");
+		window = new JFrame("Yahtzee");
 		window.setSize(1000, 520);
 		window.setLayout(new BoxLayout(window.getContentPane(), BoxLayout.X_AXIS));
 
@@ -225,6 +226,10 @@ public class GUI implements ActionListener, MouseListener {
 		lowerField = new JPanel();
 		lowerField.setPreferredSize(new Dimension(700, 250));
 		lowerField.setBackground(Color.lightGray);
+		
+		mainMenuButton = new JButton("<html>go back to <br/> main menu </html>");
+		mainMenuButton.addActionListener(this);
+		buttonRow.add(mainMenuButton);
 
 		window.add(table);
 		upperField.add(numberRow);
@@ -338,6 +343,10 @@ public class GUI implements ActionListener, MouseListener {
 				tableValues[i] = playTable.getValueAt(i+1, 1).toString();
 			}
 			saver.saveGame(player1.getName(), diceValues, tableValues, attempt);
+		}
+		if(e.getSource() == mainMenuButton) {
+			new KniffelGame();
+			window.dispose();
 		}
 	}
 

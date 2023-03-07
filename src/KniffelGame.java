@@ -32,18 +32,17 @@ public class KniffelGame extends JFrame implements ActionListener{
 
 	public static void main(String[] args) {
 		
-		KniffelGame game = new KniffelGame();
-		
+		new KniffelGame();
 	}
 	
 	public KniffelGame() {
-		setTitle("Kniffel");
+		setTitle("Yahtzee main menu");
 		setSize(400,400);
 		setLayout(new BorderLayout());
 		
 		handler = new SaveGameHandler();
 		
-		welcomeText = new JLabel("Welcome to Kniffel!", SwingConstants.CENTER);
+		welcomeText = new JLabel("Welcome to Yahtzee!", SwingConstants.CENTER);
 		welcomeText.setFont(new Font("Dialog", Font.BOLD, 30));
 		
 		buttonPanel = new JPanel();
@@ -97,7 +96,7 @@ public class KniffelGame extends JFrame implements ActionListener{
 	// starts a new game with no values
 	public void startGame(String playerName) {
 		gameGUI = new GUI(playerName);
-		this.setVisible(false);
+		dispose();
 		}
 	
 	// starts a game with given values (loading)

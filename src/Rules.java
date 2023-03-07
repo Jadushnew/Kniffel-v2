@@ -19,6 +19,7 @@ public class Rules extends JFrame implements ActionListener{
 	public Rules() {
 		setTitle("Rules");
 		setLayout(new BorderLayout());
+		
 		createText();
 		add(textPanel);
 		
@@ -31,8 +32,8 @@ public class Rules extends JFrame implements ActionListener{
 
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setLocationRelativeTo(null);
 		pack();
+		setLocationRelativeTo(null);
 	}
 	
 	private void createText() {
