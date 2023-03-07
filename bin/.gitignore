@@ -4,8 +4,9 @@
 /GUI.class
 /KniffelGame.class
 /KniffelTableModel.class
-/NumberPanel.class
 /OutputPanel.class
 /Player.class
 /RollCheckPanel.class
 /SaveGameHandler.class
+/Rules.class
+/RulesText.class
