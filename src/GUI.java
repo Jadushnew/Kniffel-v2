@@ -54,7 +54,8 @@ public class GUI implements ActionListener, MouseListener {
 	private boolean cancelModeOn = false;
 
 	private String notValid = "not a valid row. Please choose another!";
-
+	
+	// constructor called when a new game is created
 	public GUI(String playerName) {
 
 		player1 = new Player(playerName);
@@ -83,7 +84,8 @@ public class GUI implements ActionListener, MouseListener {
 		createDice();
 
 	}
-
+	
+	// constructor called when an old game is loaded, sets values
 	public GUI(String playerName, int[] currentValues, String[] currentTableValues, int currentAttempts) {
 
 		player1 = new Player(playerName);
@@ -120,7 +122,8 @@ public class GUI implements ActionListener, MouseListener {
 		createDice(currentValues);
 
 	}
-
+	
+	// creates the frame and the table part of the game
 	public void createBackground() {
 		window = new JFrame("Yahtzee");
 		window.setSize(1000, 520);
@@ -131,7 +134,8 @@ public class GUI implements ActionListener, MouseListener {
 		table.setPreferredSize(new Dimension(300, 520));
 		table.setBackground(Color.gray);
 	}
-
+	
+	// creates the play field on the right side of the game and the panels for the dice and the buttons
 	public void createPlayfield() {
 		playField = new JPanel();
 		playField.setLayout(new BoxLayout(playField, BoxLayout.Y_AXIS));
@@ -146,7 +150,7 @@ public class GUI implements ActionListener, MouseListener {
 		buttonRow.setPreferredSize(new Dimension(690, 240));
 	}
 
-	//gets called when table is created from a save file
+	// gets called when table is created from a save file
 	public void createTable(String[] currentTableValues) {
 
 		for (int i = 1; i < 19; i++) {
@@ -173,7 +177,8 @@ public class GUI implements ActionListener, MouseListener {
 
 		playTable.addMouseListener(this);
 	}
-
+	
+	// creates a new table
 	public void createTable() {
 
 		for (int i = 1; i < 19; i++) {
@@ -200,7 +205,8 @@ public class GUI implements ActionListener, MouseListener {
 
 		playTable.addMouseListener(this);
 	}
-
+	
+	// creates the buttons which will be added to the button row
 	public void createKeepButtons() {
 		for (int i = 0; i < buttons.length; i++) {
 			buttons[i] = new JButton();
@@ -213,7 +219,8 @@ public class GUI implements ActionListener, MouseListener {
 			buttonRow.add(buttons[i]);
 		}
 	}
-
+	
+	// method created for a cleaner constructor (hides creation of other buttons and panels)
 	public void createOtherStuff() {
 		rcp.getButton().addActionListener(this);
 		buttonRow.add(rcp);
@@ -255,31 +262,33 @@ public class GUI implements ActionListener, MouseListener {
 		window.toFront();
 		window.setLocationRelativeTo(null);
 	}
-
+	
+	// decreases attempts and updates the roll check panel accordingly
 	public void decreaseAttempt() {
 		this.attemptsLeft--;
 		rcp.decreaseAttempt(attemptsLeft);
 	}
-
+	
 	public int getAttempt() {
 		return attemptsLeft;
 	}
 
-	// creates 5 dice
+	// creates 5 new default dice
 	public void createDice() {
 		for (int i = 0; i < buttons.length; i++) {
 			dice[i] = new Die(6);
 		}
 	}
 
-	// for creating dice from a loaded game
+	// method for creating dice from a loaded game
 	public void createDice(int[] desiredValues) {
 		for (int i = 0; i < buttons.length; i++) {
 			dice[i] = new Die(6);
 			dice[i].rollDie(desiredValues[i]);
 		}
 	}
-
+	
+	// calls the rollDie()-method of a die if it is not set to kept
 	public void rollDice() {
 		for (int i = 0; i < dice.length; i++) {
 			if (dice[i].getKept() == false) {
