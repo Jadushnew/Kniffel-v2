@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -12,8 +13,10 @@ import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -33,9 +36,11 @@ public class GUI implements ActionListener, MouseListener {
 	private JButton cancelRowButton;
 	private JButton saveButton;
 	private JButton mainMenuButton;
+	private JPanel highscorePanel;
+	private JLabel highscoreLabel;
 	// OutputPanel holds the playerName and gives commands to the player
 	private OutputPanel opp;
-	private int attempt = 3;
+	private int attemptsLeft = 3;
 	private int roundPoints = 0;
 	private Player player1;
 
@@ -47,6 +52,8 @@ public class GUI implements ActionListener, MouseListener {
 	private int[] diceValues = new int[5];
 
 	private boolean cancelModeOn = false;
+
+	private String notValid = "not a valid row. Please choose another!";
 
 	public GUI(String playerName) {
 
@@ -69,7 +76,7 @@ public class GUI implements ActionListener, MouseListener {
 
 		createKeepButtons();
 
-		rcp = new RollCheckPanel(attempt);
+		rcp = new RollCheckPanel(attemptsLeft);
 
 		createOtherStuff();
 
@@ -109,7 +116,7 @@ public class GUI implements ActionListener, MouseListener {
 
 		createOtherStuff();
 
-		attempt = currentAttempts;
+		attemptsLeft = currentAttempts;
 		createDice(currentValues);
 
 	}
@@ -226,10 +233,15 @@ public class GUI implements ActionListener, MouseListener {
 		lowerField = new JPanel();
 		lowerField.setPreferredSize(new Dimension(700, 250));
 		lowerField.setBackground(Color.lightGray);
-		
+
 		mainMenuButton = new JButton("<html>go back to <br/> main menu </html>");
 		mainMenuButton.addActionListener(this);
 		buttonRow.add(mainMenuButton);
+
+		highscoreLabel = new JLabel("highscore: " + Highscore.getHighscore(), SwingConstants.CENTER);
+		highscorePanel = new JPanel(new BorderLayout());
+		highscorePanel.add(highscoreLabel, BorderLayout.CENTER);
+		buttonRow.add(highscorePanel);
 
 		window.add(table);
 		upperField.add(numberRow);
@@ -245,13 +257,12 @@ public class GUI implements ActionListener, MouseListener {
 	}
 
 	public void decreaseAttempt() {
-		this.attempt--;
-		;
-		rcp.decreaseAttempt(attempt);
+		this.attemptsLeft--;
+		rcp.decreaseAttempt(attemptsLeft);
 	}
 
 	public int getAttempt() {
-		return attempt;
+		return attemptsLeft;
 	}
 
 	// creates 5 dice
@@ -303,7 +314,6 @@ public class GUI implements ActionListener, MouseListener {
 			button.setText("not kept!");
 			button.setBackground(null);
 		}
-
 	}
 
 	@Override
@@ -329,7 +339,7 @@ public class GUI implements ActionListener, MouseListener {
 			changeButtonText(dice[4], buttons[4]);
 		}
 		if (e.getSource() == rcp.getButton()) {
-			if (attempt > 0) {
+			if (attemptsLeft > 0) {
 				attempt();
 			}
 		}
@@ -342,7 +352,7 @@ public class GUI implements ActionListener, MouseListener {
 			for(int i=0; i < tableValues.length; i++) {
 				tableValues[i] = playTable.getValueAt(i+1, 1).toString();
 			}
-			saver.saveGame(player1.getName(), diceValues, tableValues, attempt);
+			saver.saveGame(player1.getName(), diceValues, tableValues, attemptsLeft);
 		}
 		if(e.getSource() == mainMenuButton) {
 			new KniffelGame();
@@ -350,22 +360,20 @@ public class GUI implements ActionListener, MouseListener {
 		}
 	}
 
-
 	// handles the tables cell when clicked on
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		int row = playTable.rowAtPoint(e.getPoint());
 		int col = playTable.columnAtPoint(e.getPoint());
-		System.out.println(row);
 		handleEndOfRound(row, col);
 	}
 
 	// handles the end of a round, checks if game should end are executed every round
 	public void handleEndOfRound(int row, int col) {
 
-		if (col == 1 && attempt < 3) {
+		if (col == 1 && attemptsLeft <= 3) {
 
-			if (row != 0 && row != 7 && row != 8 && row != 9 && row < 17 && playTable.getValueAt(row, col).toString() != "cancelled" && playTable.getValueAt(row, col) == "0") {
+			if (row != 0 && row != 7 && row != 8 && row != 9 && row < 17 && playTable.getValueAt(row, col).toString() == "0") {
 
 				if(cancelModeOn) {
 					// if cancelModeOn rowValue will be set to "cancelled" if the rows is still 0
@@ -373,38 +381,50 @@ public class GUI implements ActionListener, MouseListener {
 					if (playTable.getValueAt(row, 1).toString().equals("0")) {
 						playTable.setValueAt("cancelled", row, 1);
 						cancelRow();
+						checkStatus();
 						roundRestart();
 					}
 				} else {
 					// otherwise points will be booked accordingly 
 					if (checkIfWriteable(row)) {
 						bookPoints(row);
+						checkStatus();
+						roundRestart();
 					} else {
-						opp.setOutput("not a valid row! Please choose another!");
+						opp.setOutput(notValid);
 					}
 				}
-
-				if (checkIfUpperPartIsFull()) {
-					writeSum(7);
-					giveBonus();
-				}
-
-				if (checkIfLowerPartIsFull()) {
-					writeSum(18);
-				}
-				if (checkIfUpperPartIsFull() && checkIfLowerPartIsFull()) {
-					writeSum(19);
-					opp.setOutput("Game ended. Final score: " + playTable.getValueAt(19, 1));
-					deactivateInputs();
-				}
-				roundRestart();
+			} else {
+				opp.setOutput(notValid);
 			}
 		}
 	}
 
-	// checks if the selected row is not filled out yet and notes the points for writing them later
-	public boolean checkIfWriteable(int row) {
+	// checks if sections are full
+	private void checkStatus() {
+		if (checkIfPartIsFull(1,6)) {
+			writeSum(7);
+			giveBonus();
+		}
 
+		if (checkIfPartIsFull(10,7)) {
+			writeSum(18);
+		}
+		if (checkIfPartIsFull(1,6) && checkIfPartIsFull(10,7)) {
+			writeSum(19);
+			opp.setOutput("Game ended. Final score: " + playTable.getValueAt(19, 1));
+			if(Highscore.isHigher(Integer.parseInt(playTable.getValueAt(19, 1).toString()))) {
+				Highscore.setHighscore(Integer.parseInt(playTable.getValueAt(19, 1).toString()));
+				highscoreLabel.setText(Highscore.getHighscore());
+				highscorePanel.revalidate();
+			}
+			deactivateInputs();
+		}
+	}
+
+	// checks if the row is valid for writing by checking if your combination would generate points by the rule of the role
+	public boolean checkIfWriteable(int row) {
+		//a row is only writable if it's current value is still 0 -> still in default state
 		if (Integer.parseInt( (String) playTable.getValueAt(row, 1)) == 0) {
 
 			// check number rows
@@ -509,7 +529,7 @@ public class GUI implements ActionListener, MouseListener {
 				}
 				return true;
 			}
-			// check for Kniffel
+			// check for Yahtzee
 			if (row == 15) {
 				int result = 0;
 				for (int i = 0; i < dice.length; i++) {
@@ -520,7 +540,7 @@ public class GUI implements ActionListener, MouseListener {
 				}
 				return true;
 			}
-			// check for Chance
+			// check for chance (chance is always possible if not filled out yet)
 			if (row == 16) {
 				for (int i = 0; i < dice.length; i++) {
 					roundPoints += dice[i].getValue();
@@ -542,71 +562,43 @@ public class GUI implements ActionListener, MouseListener {
 	public void writeSum(int row) {
 		switch (row) {
 		case 7: {
-			playTable.setValueAt(Integer.toString(sumUpperPoints()), row, 1);
+			playTable.setValueAt(Integer.toString(sumPoints(1,0)), row, 1);
 			break;
 		}
 		case 18: {
-			playTable.setValueAt(Integer.toString(sumLowerPoints()), row, 1);
+			playTable.setValueAt(Integer.toString(sumPoints(10,1)), row, 1);
 			break;
 		}
 		case 19: {
-			int finalSum = sumUpperPoints() + sumLowerPoints();
+			int finalSum = sumPoints(1,0) + sumPoints(10,1);
 			playTable.setValueAt(Integer.toString(finalSum), row, 1);
 			break;
 		}
 		}
 	}
 
-	public int sumUpperPoints() {
-		int upperSum = 0;
-		for (int i = 1; i < 7; i++) {
+	//sums the points for the score. Addition is needed because lower section is larger by one row
+	public int sumPoints(int startingRow, int addition) {
+		int sum = 0;
+		for (int i = startingRow; i < startingRow+6+addition; i++) {
 			if (!playTable.getValueAt(i, 1).toString().equals("cancelled")) {
-				upperSum += Integer.parseInt(playTable.getValueAt(i, 1).toString());
+				sum += Integer.parseInt(playTable.getValueAt(i, 1).toString());
 			}
 		}
-		return upperSum;
+		return sum;
 	}
 
-	public int sumLowerPoints() {
-		int lowerSum = 0;
-		for (int i = 10; i < 17; i++) {
-			if (!playTable.getValueAt(i, 1).toString().equals("cancelled")) {
-				lowerSum += Integer.parseInt(playTable.getValueAt(i, 1).toString());
-			}
-		}
-		return lowerSum;
-	}
-
-	// checks if the upper part of the table is full
-	public boolean checkIfUpperPartIsFull() {
-	
-		boolean[] isFull = new boolean[6];
-		for (int i = 1; i < 7; i++) {
+	//checking method for the writing of the score. Uses starting row and section length to differentiate between upper and lower section of the table
+	public boolean checkIfPartIsFull(int startingRow, int sectionLength) {
+		boolean[] isFull = new boolean[sectionLength];
+		for(int i = startingRow; i < startingRow + sectionLength; i++) {
 			if ((playTable.getValueAt(i, 1)).toString().equals("cancelled") || !(playTable.getValueAt(i, 1)).toString().equals("0")) {
-				isFull[i-1] = true;
+				isFull[i-startingRow] = true;
 			} else {
-				isFull[i-1] = false;
+				isFull[i-startingRow] = false;
 			}
 		}
 		if (isFull[0] && isFull[1] && isFull[2] && isFull[3] && isFull[4] && isFull[5]) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// checks if the lower part of the table is full
-	public boolean checkIfLowerPartIsFull() {
-	
-		boolean[] isFull = new boolean[7];
-		for (int i = 10; i < 17; i++) {
-			if ((playTable.getValueAt(i, 1)).toString().equals("cancelled") || !(playTable.getValueAt(i, 1)).toString().equals("0")) {
-				isFull[i-10] = true;
-			} else {
-				isFull[i-10] = false;
-			}
-		}
-		if (isFull[0] && isFull[1] && isFull[2] && isFull[3] && isFull[4] && isFull[5] && isFull[6]) {
 			return true;
 		} else {
 			return false;
@@ -627,7 +619,7 @@ public class GUI implements ActionListener, MouseListener {
 
 	// resets attempts, roundPoints, dice, and buttons
 	public void roundRestart() {
-		attempt = 3;
+		attemptsLeft = 3;
 		roundPoints = 0;
 		for (int i = 0; i < buttons.length; i++) {
 			dice[i].setUnKept();

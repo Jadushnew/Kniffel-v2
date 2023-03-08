@@ -29,7 +29,6 @@ public class SaveGameHandler{
 			writer.close();
 		} catch (IOException e) {
 			System.out.println("saving failed!");
-			e.printStackTrace();
 		}
 	}
 	
