@@ -1,13 +1,6 @@
 /Die.class
-/GUI$1.class
-/GUI$2.class
-/GUI.class
-/KniffelGame.class
 /KniffelTableModel.class
 /OutputPanel.class
-/Player.class
 /RollCheckPanel.class
 /SaveGameHandler.class
-/Rules.class
-/RulesText.class
-/Highscore.class
+/MainMenu.class

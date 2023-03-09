@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/*
+ *  class that handles saving and loading of save games. ATTENTION: CURRENTLY NOT WORKING GLOBALLY
+ */
 public class SaveGameHandler{
 	
 	private String[] desiredTableValues = new String[19];
@@ -13,6 +16,8 @@ public class SaveGameHandler{
 	private int[] desiredValues = new int[5];
 	private int desiredAttempts;
 
+	// writes all relevant Data into a .txt file
+	// writes into saves folder in project folder
 	public void saveGame(String playerName, int[] currentValues, String[] currentTableValues, int currentAttempts) {
 		try {
 			BufferedWriter writer;
@@ -32,6 +37,7 @@ public class SaveGameHandler{
 		}
 	}
 	
+	// reads from given .txt file
 	public void loadGame(File toLoad) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(toLoad));

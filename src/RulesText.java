@@ -1,10 +1,12 @@
-
+/*
+ *  class that provides text for rules. Used in Rules class which is used by main menu
+ */
 public class RulesText {
 	
 	private static String rulesText = 
 			"<html>In Yahtzee you try to score as many points a possible.<br/>"
 			+"To do that you try to have different dice combinations "
-			+"which are listed in a table. <br/>Per round you may roll the dice three times, "
+			+"which are listed in the table on the left. <br/>Per round you may roll the dice three times, "
 			+"always deciding which ones to keep and which ones to roll again.<br/>"
 			+"As soon as you are happy with your result or after three rolls at the latest, <br/>"
 			+"you have to score your points in a suiting row in the table by clicking in it. <br/>"

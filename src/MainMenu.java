@@ -8,7 +8,6 @@ import java.io.File;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,28 +15,29 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-public class KniffelGame extends JFrame implements ActionListener{
+public class MainMenu extends JFrame implements ActionListener{
 	
-	private int[] keepingNumbers = new int[5];
-	private int[] currentDiceValues = new int[5];
-	private GUI gameGUI;
 	private JLabel welcomeText;
 	private JPanel buttonPanel;
+	
 	private JButton newGameButton;
 	private JButton loadSaveButton;
 	private JButton howToPlayButton;
+	private JButton closeGameButton;
+	
+	private Rules rules;
+	
 	private JTextField name;
-	private String playerName;
 	private SaveGameHandler handler;
 
 	public static void main(String[] args) {
-		
-		new KniffelGame();
+		new MainMenu();
 	}
 	
-	public KniffelGame() {
+	public MainMenu() {
 		setTitle("Yahtzee main menu");
 		setSize(400,400);
+		setResizable(false);
 		setLayout(new BorderLayout());
 		
 		handler = new SaveGameHandler();
@@ -46,18 +46,19 @@ public class KniffelGame extends JFrame implements ActionListener{
 		welcomeText.setFont(new Font("Dialog", Font.BOLD, 30));
 		
 		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+		
 		newGameButton = new JButton("start new game");
-		newGameButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
 		newGameButton.addActionListener(this);
+		
 		loadSaveButton = new JButton("load save");
-		loadSaveButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
 		loadSaveButton.addActionListener(this);
 		
 		howToPlayButton = new JButton("how to play?");
-		howToPlayButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
 		howToPlayButton.addActionListener(this);
 		
-		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+		closeGameButton = new JButton("exit game");
+		closeGameButton.addActionListener(this);
 		
 		buttonPanel.add(Box.createRigidArea(new Dimension(124, 30)));
 		buttonPanel.add(newGameButton);
@@ -65,14 +66,19 @@ public class KniffelGame extends JFrame implements ActionListener{
 		buttonPanel.add(loadSaveButton);
 		buttonPanel.add(Box.createRigidArea(new Dimension(124, 10)));
 		buttonPanel.add(howToPlayButton);
-		
+		buttonPanel.add(Box.createRigidArea(new Dimension(124, 10)));
+		buttonPanel.add(closeGameButton);
+		buttonPanel.add(Box.createRigidArea(new Dimension(124, 10)));
+
 		forceSize(newGameButton);
 		forceSize(loadSaveButton);
 		forceSize(howToPlayButton);
+		forceSize(closeGameButton);
 		
 		newGameButton.setAlignmentX(0);
 		loadSaveButton.setAlignmentX(0);
 		howToPlayButton.setAlignmentX(0);
+		closeGameButton.setAlignmentX(0);
 		
 		this.add(welcomeText, BorderLayout.NORTH);
 		this.add(buttonPanel, BorderLayout.CENTER);
@@ -82,7 +88,8 @@ public class KniffelGame extends JFrame implements ActionListener{
 		setLocationRelativeTo(null);
 	}
 	
-	public void startNewGame() {
+	// opens the name field to enter your name
+	public void openNameField() {
 		name = new JTextField(20);
 		name.addActionListener(this);
 		forceSize(name);
@@ -93,9 +100,9 @@ public class KniffelGame extends JFrame implements ActionListener{
 		this.revalidate();
 	}
 	
-	// starts a new game with no values
+	// starts a new game with no values 
 	public void startGame(String playerName) {
-		gameGUI = new GUI(playerName);
+		new GUI(playerName);
 		dispose();
 		}
 	
@@ -108,7 +115,7 @@ public class KniffelGame extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == newGameButton) {
-			startNewGame();
+			openNameField();
 		}
 		if(e.getSource() == loadSaveButton) {
 			JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "\\saves\\");
@@ -118,17 +125,26 @@ public class KniffelGame extends JFrame implements ActionListener{
 				handler.loadGame(selectedFile);
 				startGame();
 			} catch (NullPointerException e1) {
+				System.out.println("loading cancelled.");
 			}
 		}
 		if(e.getSource() == name) {
 			startGame(name.getText());
 		}
 		if(e.getSource() == howToPlayButton) {
-			new Rules();
+			rules = new Rules(this);
+			howToPlayButton.setEnabled(false);
+		}
+		if(e.getSource() == closeGameButton) {
+			this.dispose();
+			if(rules != null) {
+				rules.dispose();
+			}
 		}
 		
 	}
 	
+	// makes sure that buttons have the right size
 	private void forceSize(JButton button) {
 		  button.setMaximumSize(new Dimension(124, 30));
 		  button.setMinimumSize(new Dimension(124, 30));
@@ -136,12 +152,18 @@ public class KniffelGame extends JFrame implements ActionListener{
 		  button.setPreferredSize(new Dimension(124, 30));
 		}
 	
+	// makes sure that the textfield has the right size
 	private void forceSize(JTextField field) {
 		  field.setMaximumSize(new Dimension(124, 30));
 		  field.setMinimumSize(new Dimension(124, 30));
 		  field.setSize(new Dimension(124, 30));
 		  field.setPreferredSize(new Dimension(124, 30));
 		}
+	
+	// used in Rules class to enable the button again
+	public JButton getHowToPlayButton() {
+		return howToPlayButton;
+	}
 	
 	
 }

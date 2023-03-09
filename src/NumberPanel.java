@@ -35,4 +35,9 @@ public class NumberPanel extends JPanel {
 	public void setNumber(int number) {
 		this.number.setText(Integer.toString(number));
 	}
-}
+	
+	public void setNumber(String number) {
+		this.number.setText(number);
+	}
+}	
+
