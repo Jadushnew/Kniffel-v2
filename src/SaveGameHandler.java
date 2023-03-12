@@ -52,7 +52,6 @@ public class SaveGameHandler{
 			reader.close();
 		} catch (IOException e) {
 			System.out.println("loading failed!");
-			e.printStackTrace();
 		}
 	}
 

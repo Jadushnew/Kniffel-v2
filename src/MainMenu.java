@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,9 @@ public class MainMenu extends JFrame implements ActionListener{
 	private JPanel buttonPanel;
 	
 	private JButton newGameButton;
+	private Component nameBox;
+	private JLabel nameEnter;
+	private Component nameBox2;
 	private JButton loadSaveButton;
 	private JButton howToPlayButton;
 	private JButton closeGameButton;
@@ -29,6 +33,8 @@ public class MainMenu extends JFrame implements ActionListener{
 	
 	private JTextField name;
 	private SaveGameHandler handler;
+	
+	private final String ENTER_NAME_LABEL = "<html>Please enter your name:";
 
 	public static void main(String[] args) {
 		new MainMenu();
@@ -51,6 +57,12 @@ public class MainMenu extends JFrame implements ActionListener{
 		newGameButton = new JButton("start new game");
 		newGameButton.addActionListener(this);
 		
+		nameEnter = new JLabel(ENTER_NAME_LABEL);
+		name = new JTextField();
+		name.addActionListener(this);
+		name.setVisible(false);
+		forceSize(name);
+		
 		loadSaveButton = new JButton("load save");
 		loadSaveButton.addActionListener(this);
 		
@@ -63,6 +75,19 @@ public class MainMenu extends JFrame implements ActionListener{
 		buttonPanel.add(Box.createRigidArea(new Dimension(124, 30)));
 		buttonPanel.add(newGameButton);
 		buttonPanel.add(Box.createRigidArea(new Dimension(124, 10)));
+		buttonPanel.add(nameEnter);
+		
+		nameBox2 = Box.createRigidArea(new Dimension(124, 10));
+		buttonPanel.add(nameBox2);
+		nameBox2.setVisible(false);
+		
+		buttonPanel.add(name);
+		
+		nameBox = Box.createRigidArea(new Dimension(124, 10));
+		buttonPanel.add(nameBox);
+		nameBox.setVisible(false);
+		nameEnter.setVisible(false);
+		
 		buttonPanel.add(loadSaveButton);
 		buttonPanel.add(Box.createRigidArea(new Dimension(124, 10)));
 		buttonPanel.add(howToPlayButton);
@@ -88,29 +113,6 @@ public class MainMenu extends JFrame implements ActionListener{
 		setLocationRelativeTo(null);
 	}
 	
-	// opens the name field to enter your name
-	public void openNameField() {
-		name = new JTextField(20);
-		name.addActionListener(this);
-		forceSize(name);
-		buttonPanel.add(new JLabel("Please enter your name:"));
-		newGameButton.setEnabled(false);
-		buttonPanel.add(name);
-		name.setAlignmentX(0);
-		this.revalidate();
-	}
-	
-	// starts a new game with no values 
-	public void startGame(String playerName) {
-		new GUI(playerName);
-		dispose();
-		}
-	
-	// starts a game with given values (loading)
-	public void startGame() {
-		new GUI(handler.getDesiredPlayerName(), handler.getDesiredValues(), handler.getDesiredTableValues(), handler.getDesiredAttempts());
-		this.setVisible(false);
-	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -129,7 +131,12 @@ public class MainMenu extends JFrame implements ActionListener{
 			}
 		}
 		if(e.getSource() == name) {
-			startGame(name.getText());
+			if(name.getText().length() <= 20) {
+				startGame(name.getText());
+			} else {
+				nameEnter.setText(ENTER_NAME_LABEL + "<br/> Not more than 20 characters allowed!</html>");
+			}
+	
 		}
 		if(e.getSource() == howToPlayButton) {
 			rules = new Rules(this);
@@ -141,7 +148,29 @@ public class MainMenu extends JFrame implements ActionListener{
 				rules.dispose();
 			}
 		}
-		
+	}
+
+	// opens the name field to enter your name
+	public void openNameField() {
+		newGameButton.setEnabled(false);
+		nameBox.setVisible(true);
+		nameEnter.setVisible(true);
+		name.setVisible(true);
+		nameBox2.setVisible(true);
+		name.setAlignmentX(0);
+		this.revalidate();
+	}
+
+	// starts a new game with no values 
+	public void startGame(String playerName) {
+		new GUI(playerName);
+		dispose();
+		}
+	
+	// starts a game with given values (loading)
+	public void startGame() {
+		new GUI(handler.getDesiredPlayerName(), handler.getDesiredValues(), handler.getDesiredTableValues(), handler.getDesiredAttempts());
+		this.setVisible(false);
 	}
 	
 	// makes sure that buttons have the right size

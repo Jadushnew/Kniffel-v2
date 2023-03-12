@@ -12,6 +12,7 @@ import java.util.Arrays;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,11 +34,11 @@ public class GUI implements ActionListener, MouseListener {
 	private NumberPanel[] nps = new NumberPanel[5];
 	// RollCheckPanel holds the attempts and the rollButton
 	private RollCheckPanel rcp;
-	
+
 	private JButton cancelRowButton;
 	private JButton saveButton;
 	private JButton mainMenuButton;
-	
+
 	private JPanel highscorePanel;
 	private JLabel highscoreLabel;
 	// OutputPanel holds the playerName and gives commands to the player
@@ -45,10 +46,10 @@ public class GUI implements ActionListener, MouseListener {
 	private int attemptsLeft = 3;
 	private int roundPoints = 0;
 	private Player player1;
-	
+
 	private JPanel roundBackground;
 	private JLabel roundLabel;
-	
+
 	private String[][] tableArray = new String[20][2];
 	private String[] headerArray = new String[] { "combinations", "points" };
 	private JTable playTable;
@@ -58,8 +59,6 @@ public class GUI implements ActionListener, MouseListener {
 
 	private boolean cancelModeOn = false;
 
-	private String notValid = "not a valid row. Please choose another!";
-	
 	// constructor called when a new game is created
 	public GUI(String playerName) {
 
@@ -68,7 +67,7 @@ public class GUI implements ActionListener, MouseListener {
 		createBackground();
 
 		createTable();
-		
+
 		table.add(roundBackground);
 		table.add(playTable);
 		opp = new OutputPanel(playerName);
@@ -90,7 +89,7 @@ public class GUI implements ActionListener, MouseListener {
 		createDice();
 
 	}
-	
+
 	// constructor called when an old game is loaded, sets values
 	public GUI(String playerName, int[] currentValues, String[] currentTableValues, int currentAttempts) {
 
@@ -99,7 +98,7 @@ public class GUI implements ActionListener, MouseListener {
 		createBackground();
 
 		createTable(currentTableValues);
-		
+
 		table.add(roundBackground);
 		table.add(playTable);
 		opp = new OutputPanel(playerName);
@@ -129,7 +128,7 @@ public class GUI implements ActionListener, MouseListener {
 		createDice(currentValues);
 
 	}
-	
+
 	// creates the frame and the table part of the game
 	public void createBackground() {
 		window = new JFrame("Yahtzee");
@@ -142,7 +141,7 @@ public class GUI implements ActionListener, MouseListener {
 		table.setPreferredSize(new Dimension(300, 520));
 		table.setBackground(Color.gray);
 	}
-	
+
 	// creates the play field on the right side of the game and the panels for the dice and the buttons
 	public void createPlayfield() {
 		playField = new JPanel();
@@ -160,7 +159,7 @@ public class GUI implements ActionListener, MouseListener {
 
 	// gets called when table is created from a save file
 	public void createTable(String[] currentTableValues) {
-		
+
 		for (int i = 1; i < 19; i++) {
 			tableArray[i][0] = player1.getCategory(i - 1);
 		}
@@ -184,13 +183,46 @@ public class GUI implements ActionListener, MouseListener {
 		}
 
 		playTable.addMouseListener(this);
-		
+
 		roundLabel = new JLabel("Round: " + getRound());
 		roundBackground = new JPanel();
 		roundBackground.setSize(300, 50);
 		roundBackground.add(roundLabel);
 	}
-	
+
+	// creates a new table
+	public void createTable() {
+
+		for (int i = 1; i < 19; i++) {
+			tableArray[i][0] = player1.getCategory(i - 1);
+		}
+		tableArray[19][0] = player1.getCategory(18);
+
+		TableModel model = new DefaultTableModel(tableArray, headerArray) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;// This causes all cells to be not editable
+			}
+		};
+
+		playTable = new JTable(model);
+		playTable.setPreferredSize(new Dimension(290, 520));
+
+		playTable.setValueAt(headerArray[0], 0, 0);
+		playTable.setValueAt(headerArray[1], 0, 1);
+
+		for (int i = 1; i < 20; i++) {
+			playTable.setValueAt("0", i, 1);
+		}
+
+		playTable.addMouseListener(this);
+
+		roundLabel = new JLabel("Round: " + getRound());
+		roundBackground = new JPanel();
+		roundBackground.setSize(300, 50);
+		roundBackground.add(roundLabel);
+	}
+
 	// gets the number of rounds by counting how many rows have a value (used above table)
 	private String getRound() {
 		boolean[] isFull = new boolean[playTable.getRowCount()-7];
@@ -217,39 +249,6 @@ public class GUI implements ActionListener, MouseListener {
 		return Integer.toString(roundNumber);
 	}
 
-	// creates a new table
-	public void createTable() {
-		
-		for (int i = 1; i < 19; i++) {
-			tableArray[i][0] = player1.getCategory(i - 1);
-		}
-		tableArray[19][0] = player1.getCategory(18);
-
-		TableModel model = new DefaultTableModel(tableArray, headerArray) {
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false;// This causes all cells to be not editable
-			}
-		};
-
-		playTable = new JTable(model);
-		playTable.setPreferredSize(new Dimension(290, 520));
-
-		playTable.setValueAt(headerArray[0], 0, 0);
-		playTable.setValueAt(headerArray[1], 0, 1);
-
-		for (int i = 1; i < 20; i++) {
-			playTable.setValueAt("0", i, 1);
-		}
-
-		playTable.addMouseListener(this);
-		
-		roundLabel = new JLabel("Round: " + getRound());
-		roundBackground = new JPanel();
-		roundBackground.setSize(300, 50);
-		roundBackground.add(roundLabel);
-	}
-	
 	// creates the buttons which will be added to the button row
 	public void createKeepButtons() {
 		for (int i = 0; i < buttons.length; i++) {
@@ -263,7 +262,7 @@ public class GUI implements ActionListener, MouseListener {
 			buttonRow.add(buttons[i]);
 		}
 	}
-	
+
 	// method created for a cleaner constructor (hides creation of other buttons and panels)
 	public void createOtherStuff() {
 		rcp.getButton().addActionListener(this);
@@ -306,13 +305,13 @@ public class GUI implements ActionListener, MouseListener {
 		window.toFront();
 		window.setLocationRelativeTo(null);
 	}
-	
+
 	// decreases attempts and updates the roll check panel accordingly
 	public void decreaseAttempt() {
 		this.attemptsLeft--;
 		rcp.updateRCP(attemptsLeft);
 	}
-	
+
 	public int getAttempt() {
 		return attemptsLeft;
 	}
@@ -331,7 +330,7 @@ public class GUI implements ActionListener, MouseListener {
 			dice[i].rollDie(desiredValues[i]);
 		}
 	}
-	
+
 	// calls the rollDie()-method of a die if it is not set to kept
 	public void rollDice() {
 		for (int i = 0; i < dice.length; i++) {
@@ -354,6 +353,7 @@ public class GUI implements ActionListener, MouseListener {
 				buttons[i].setEnabled(true);
 			}
 		}
+		opp.setOutput("please continue rolling or book your points");
 		decreaseAttempt();
 		rollDice();
 		displayNumber();
@@ -413,43 +413,50 @@ public class GUI implements ActionListener, MouseListener {
 		}
 	}
 
-	// handles the tables cell when clicked on
+	// handles the tables cell when clicked on, used for scoring the player's points
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		int row = playTable.rowAtPoint(e.getPoint());
 		int col = playTable.columnAtPoint(e.getPoint());
-		handleEndOfRound(row, col);
+
+		if (col == 1 && attemptsLeft < 3) {
+			handleEndOfRound(row, col);
+		} else {
+			if(col != 1) {
+				opp.setNotValid();
+			}
+			if(attemptsLeft >= 3) {
+				opp.setNotYetRolled();
+			}
+		}
 	}
 
 	// handles the end of a round, checks if game should end are executed every round
 	public void handleEndOfRound(int row, int col) {
 
-		if (col == 1 && attemptsLeft <= 3) {
+		if (row != 0 && row != 7 && row != 8 && row != 9 && row < 17 && playTable.getValueAt(row, col).toString() == "0") {
 
-			if (row != 0 && row != 7 && row != 8 && row != 9 && row < 17 && playTable.getValueAt(row, col).toString() == "0") {
-
-				if(cancelModeOn) {
-					// if cancelModeOn rowValue will be set to "cancelled" if the rows is still 0
-					// sets the cancel status back to false
-					if (playTable.getValueAt(row, 1).toString().equals("0")) {
-						playTable.setValueAt("cancelled", row, 1);
-						cancelRow();
-						checkStatus();
-						roundRestart();
-					}
-				} else {
-					// otherwise points will be booked accordingly 
-					if (checkIfWriteable(row)) {
-						bookPoints(row);
-						checkStatus();
-						roundRestart();
-					} else {
-						opp.setOutput(notValid);
-					}
+			if(cancelModeOn) {
+				// if cancelModeOn rowValue will be set to "cancelled" if the rows is still 0
+				// sets the cancel status back to false
+				if (playTable.getValueAt(row, 1).toString().equals("0")) {
+					playTable.setValueAt("cancelled", row, 1);
+					cancelRow();
+					checkStatus();
+					roundRestart();
 				}
 			} else {
-				opp.setOutput(notValid);
+				// otherwise points will be booked accordingly 
+				if (checkIfWriteable(row)) {
+					bookPoints(row);
+					checkStatus();
+					roundRestart();
+				} else {
+					opp.setNotValid();
+				}
 			}
+		} else {
+			opp.setNotValid();
 		}
 	}
 
@@ -460,12 +467,12 @@ public class GUI implements ActionListener, MouseListener {
 			writeSum(7);
 			giveBonus();
 		}
-		
+
 		// writes the score if lower part is full
 		if (checkIfPartIsFull(10,7)) {
 			writeSum(18);
 		}
-		
+
 		// writes the total score if both parts are full and ends the game
 		if (checkIfPartIsFull(1,6) && checkIfPartIsFull(10,7)) {
 			writeSum(19);
@@ -507,9 +514,9 @@ public class GUI implements ActionListener, MouseListener {
 					if (occurance[j] >= 3) {
 						roundPoints = dice[0].getValue() + dice[1].getValue() + dice[2].getValue() + dice[3].getValue()
 								+ dice[4].getValue();
+						return true;
 					}
 				}
-				return true;
 			}
 			// check four of a kind
 			if (row == 11) {
@@ -523,9 +530,9 @@ public class GUI implements ActionListener, MouseListener {
 					if (occurance[j] >= 4) {
 						roundPoints = dice[0].getValue() + dice[1].getValue() + dice[2].getValue() + dice[3].getValue()
 								+ dice[4].getValue();
+						return true;
 					}
 				}
-				return true;
 			}
 			// check for little street
 			if (row == 12) {
@@ -542,8 +549,8 @@ public class GUI implements ActionListener, MouseListener {
 				}
 				if (neighbours > 2) {
 					roundPoints = 30;
+					return true;
 				}
-				return true;
 			}
 			// check for great street
 			if (row == 13) {
@@ -560,8 +567,8 @@ public class GUI implements ActionListener, MouseListener {
 				}
 				if (neighbours > 3) {
 					roundPoints = 40;
+					return true;
 				}
-				return true;
 			}
 			// check for Full House
 			if (row == 14) {
@@ -579,12 +586,12 @@ public class GUI implements ActionListener, MouseListener {
 							if (l != k) {
 								if (occurance[l] == 3) {
 									roundPoints = 25;
+									return true;
 								}
 							}
 						}
 					}
 				}
-				return true;
 			}
 			// check for Yahtzee
 			if (row == 15) {
@@ -594,15 +601,16 @@ public class GUI implements ActionListener, MouseListener {
 				}
 				if (result % 5 == 0) {
 					roundPoints = 50;
+					return true;
 				}
-				return true;
 			}
 			// check for chance (chance is always possible if not filled out yet)
 			if (row == 16) {
 				for (int i = 0; i < dice.length; i++) {
 					roundPoints += dice[i].getValue();
+					return true;
 				}
-				return true;
+				
 			}
 
 		}

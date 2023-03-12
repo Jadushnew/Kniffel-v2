@@ -3,7 +3,7 @@
  */
 public class RulesText {
 	
-	private static String rulesText = 
+	private final static String RULES_TEXT = 
 			"<html>In Yahtzee you try to score as many points a possible.<br/>"
 			+"To do that you try to have different dice combinations "
 			+"which are listed in the table on the left. <br/>Per round you may roll the dice three times, "
@@ -17,8 +17,9 @@ public class RulesText {
 			+"<br/>"
 			+"Upper section: all the dice of the respective number count <br/>"
 			+"three / four of a kind: all dice count <br/>"
-			+"small street: 30 points <br/>"
-			+"large street: 40 points <br/>"
+			+"small street (4 consecutive values): 30 points <br/>"
+			+"large street (5 consecutive values): 40 points <br/>"
+			+"Full House (3 of a kind + 2 of a kind): 25 points <br/>"
 			+"Yahtzee: 50 points <br/>"
 			+"Chance: all dice count, no restrictions <br/>"
 			+"<br/>"
@@ -26,7 +27,7 @@ public class RulesText {
 			+"is 63 points or higher.</html>";
 	
 	public static String getText() {
-		return rulesText;
+		return RULES_TEXT;
 	}
 }
 
