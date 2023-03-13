@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 
 import javax.swing.Box;
@@ -23,7 +25,7 @@ public class MainMenu extends JFrame implements ActionListener{
 	
 	private JButton newGameButton;
 	private Component nameBox;
-	private JLabel nameEnter;
+	private JLabel nameLengthWarningLabel;
 	private Component nameBox2;
 	private JButton loadSaveButton;
 	private JButton howToPlayButton;
@@ -34,7 +36,8 @@ public class MainMenu extends JFrame implements ActionListener{
 	private JTextField name;
 	private SaveGameHandler handler;
 	
-	private final String ENTER_NAME_LABEL = "<html>Please enter your name:";
+	private final String ENTER_NAME_LABEL = "your name";
+	private final String NAME_LENGTH_WARNING = "maximum length: 20";
 
 	public static void main(String[] args) {
 		new MainMenu();
@@ -57,11 +60,25 @@ public class MainMenu extends JFrame implements ActionListener{
 		newGameButton = new JButton("start new game");
 		newGameButton.addActionListener(this);
 		
-		nameEnter = new JLabel(ENTER_NAME_LABEL);
 		name = new JTextField();
 		name.addActionListener(this);
+		name.setText(ENTER_NAME_LABEL);
+		name.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				name.setText("");
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				name.setText(ENTER_NAME_LABEL);
+			}
+		});
+		
 		name.setVisible(false);
 		forceSize(name);
+		
+		nameLengthWarningLabel = new JLabel(NAME_LENGTH_WARNING);
+		nameLengthWarningLabel.setVisible(false);
 		
 		loadSaveButton = new JButton("load save");
 		loadSaveButton.addActionListener(this);
@@ -75,18 +92,18 @@ public class MainMenu extends JFrame implements ActionListener{
 		buttonPanel.add(Box.createRigidArea(new Dimension(124, 30)));
 		buttonPanel.add(newGameButton);
 		buttonPanel.add(Box.createRigidArea(new Dimension(124, 10)));
-		buttonPanel.add(nameEnter);
+		buttonPanel.add(name);
 		
 		nameBox2 = Box.createRigidArea(new Dimension(124, 10));
 		buttonPanel.add(nameBox2);
 		nameBox2.setVisible(false);
 		
-		buttonPanel.add(name);
+		buttonPanel.add(nameLengthWarningLabel);
 		
 		nameBox = Box.createRigidArea(new Dimension(124, 10));
 		buttonPanel.add(nameBox);
 		nameBox.setVisible(false);
-		nameEnter.setVisible(false);
+		nameLengthWarningLabel.setVisible(false);
 		
 		buttonPanel.add(loadSaveButton);
 		buttonPanel.add(Box.createRigidArea(new Dimension(124, 10)));
@@ -134,7 +151,7 @@ public class MainMenu extends JFrame implements ActionListener{
 			if(name.getText().length() <= 20) {
 				startGame(name.getText());
 			} else {
-				nameEnter.setText(ENTER_NAME_LABEL + "<br/> Not more than 20 characters allowed!</html>");
+				nameLengthWarningLabel.setVisible(true);
 			}
 	
 		}
@@ -149,12 +166,13 @@ public class MainMenu extends JFrame implements ActionListener{
 			}
 		}
 	}
+	
+	
 
 	// opens the name field to enter your name
 	public void openNameField() {
 		newGameButton.setEnabled(false);
 		nameBox.setVisible(true);
-		nameEnter.setVisible(true);
 		name.setVisible(true);
 		nameBox2.setVisible(true);
 		name.setAlignmentX(0);

@@ -12,7 +12,6 @@ import java.util.Arrays;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -103,6 +102,12 @@ public class GUI implements ActionListener, MouseListener {
 		table.add(playTable);
 		opp = new OutputPanel(playerName);
 		table.add(opp);
+		
+		if(attemptsLeft > 0) {
+			opp.setOutput("please continue rolling or book your points");
+		} else {
+			opp.setOutput("please book your points");
+		}
 
 		createPlayfield();
 
@@ -433,7 +438,7 @@ public class GUI implements ActionListener, MouseListener {
 
 	// handles the end of a round, checks if game should end are executed every round
 	public void handleEndOfRound(int row, int col) {
-
+		
 		if (row != 0 && row != 7 && row != 8 && row != 9 && row < 17 && playTable.getValueAt(row, col).toString() == "0") {
 
 			if(cancelModeOn) {
@@ -596,7 +601,7 @@ public class GUI implements ActionListener, MouseListener {
 			// check for Yahtzee
 			if (row == 15) {
 				int result = 0;
-				for (int i = 0; i < dice.length; i++) {
+				for (int i = 0; i < dice.length;) {
 					result += dice[i].getValue();
 				}
 				if (result % 5 == 0) {
@@ -606,7 +611,7 @@ public class GUI implements ActionListener, MouseListener {
 			}
 			// check for chance (chance is always possible if not filled out yet)
 			if (row == 16) {
-				for (int i = 0; i < dice.length; i++) {
+				for (int i = 0; i < dice.length;) {
 					roundPoints += dice[i].getValue();
 					return true;
 				}
